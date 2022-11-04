@@ -1,0 +1,136 @@
+.navbar {
+    /* small device */
+    display: flex;
+    padding: 10px;
+    height: 65px;
+
+    .link-container {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        height: calc(100vh - 150px);
+        position: absolute;
+        top: 65px;
+        left: 0;
+        background: $mainColorLight;
+        max-width: 400px;
+        z-index: 1000;
+
+        .link {
+            padding: 7px 10px;
+        }
+        .link > a {
+            text-decoration: none;
+            color: $textColor !important;
+        }
+    } 
+    .logo_container {
+        display: flex;
+        gap: 20px;
+
+        .logo {
+            display: none;
+        }
+
+        .burger {
+            display: block;
+            position: relative;
+            padding: 0;
+            width: 35px;
+            height: 45px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        .bar {
+            display: block;
+            width: 35px;
+            height: 4px;
+            background: $textColor;
+            border-radius: 3px;
+        }
+        .bar::before, .bar::after {
+            content: '';
+            width: 35px;
+            height: 4px;
+            background: $textColor;
+            border-radius: 3px;
+            position: absolute;
+            left: 0;
+        }
+        .bar::before {
+            transform: translateY(-12px);
+        }
+        .bar::after {
+            transform: translateY(12px);
+        }
+
+        
+    }
+    .show-navbar .link-container {
+        width: 90%;
+    }
+
+    /* medium devices  */
+    @media screen and (min-width: 768px) {
+    
+        .logo_container {
+
+            .logo {
+                display: block;
+            }
+            .burger {
+                display: none;
+            }
+
+        }
+
+        .link-container {
+            flex-direction: row;
+            position: relative;
+            top: 0;
+            max-width: auto;
+            height: auto;
+            z-index: 1000;
+
+            .link > a {
+                display: block;
+                transition: all .4s ease-in-out;
+            }
+
+            .link > a::after {
+                display: block;
+                content: '';
+                width: 0;
+                height: 1px;
+                background-color: $textColor;
+                transition: width .4s;
+            }
+    
+            .link:hover > a::after {
+                width: 100%;
+            }
+        }
+
+    /*
+        
+        .show-nav  {
+            width: 100%;
+        }
+
+        
+        
+
+    
+
+        
+        
+        
+
+
+        
+        */
+    }
+    
+    
+}

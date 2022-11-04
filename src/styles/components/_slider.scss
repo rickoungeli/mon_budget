@@ -1,0 +1,25 @@
+.sliders {
+    height: 300px;
+    overflow: hidden;
+    width: 100%;
+    
+    .img-container {
+        height: 300px;
+    }
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .thumbs {
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        padding: 5px;
+    }
+
+    .thumb {
+        margin: 0 5px;
+    }
+}

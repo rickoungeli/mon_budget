@@ -1,0 +1,192 @@
+
+
+$mainColor: #29335c;
+$mainColorLight: #0c5f96;
+$secondaryColor: #db2b39;
+$textColor: #f7f7f7;
+$color-1: rgb(17, 94, 97);
+$color-3: #282c34;
+$color-4: rgb(32, 35, 42);
+$blackColor: #0c1013;
+$font-size: 13px;
+
+/* Fonts */
+$font1: 'Titillium Web', sans-serif;
+$font2: 'Poppins', sans-serif;
+$font3: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+$font4: 'Open Sans', sans-serif;
+$font5: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+*, ::before, ::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    font-size: $font-size;
+    font-family: $font1;
+}
+
+body {
+    font-size: $font-size;
+    font-family: $font2;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family:$font1;
+    font-weight: bold;
+
+}
+
+div, button, input, label {
+    font-size: $font-size;
+}
+
+
+.form-control:focus {
+    border-color: #167bff;
+    box-shadow: none;
+  }
+  
+h2 {
+    text-align: center;
+    font-size: $font-size*2;
+}
+
+ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding: 10px;
+    height: 40vh;
+}
+.main {
+
+    width: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    background-color: #db2b39;
+    border: 2px solid #db2b39;
+    height: 100%
+}
+.page {
+    &-titre {
+        height: 40px;
+    }
+
+    .dates-form {
+        height: 100px;
+        margin: 0 auto;
+        padding-left: 10px;
+    }
+
+    .ul-scrolling {
+        height: calc(100vh - 350px);
+        overflow-y: scroll;
+        overflow-x: hidden;
+        width: 98vw;
+        
+        
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .total-line {
+        display: flex;
+        justify-content: space-between;
+        color: $textColor;
+        font-weight: bold;
+        height: 30px;
+
+    }
+
+    li {
+        font-size: $font-size;
+        transition: .2s;
+        padding: 2px 0px;
+        border: 1px solid black;
+        width: 100%;
+        box-shadow: 4px 4px 3px -4px rgba(0,0,0,0.95);
+        
+        &:hover {
+            color: $mainColorLight;
+        }
+    }
+}
+ 
+
+
+a {
+    text-decoration: none;
+    color: $mainColor;
+    transition: .2s;
+    font-size: $font-size;
+
+    &:active {
+        background-color: cornflowerblue;
+        color: rgb(33, 35, 37);
+    }
+    &:hover {
+        color: $mainColorLight;
+
+    }
+}
+
+.overlay {
+    background: rgba(0,0,0,0.5);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.modal-dialog {
+    width: 100;
+    top:50%;
+    transform: translateY(-80%);
+}
+.card-container {
+    border: 1px solid $mainColor;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+.title7 {
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.perso-text-size {
+    font-size: $font-size*1.1;
+    color: $mainColor;
+}
+.btn {
+    font-size: $font-size;
+}
+.pencil {
+    cursor: pointer;
+}
+
+.inputMessage {
+    color: red;
+    text-align: left;
+}
+
+input::placeholder {
+    color: $mainColor;
+    font-size: $font-size;
+}
+
+.table {
+    min-width: 300px;
+    overflow-x: scroll;
+    width: 100%;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(-360deg);
+    }
+  }
+
+
