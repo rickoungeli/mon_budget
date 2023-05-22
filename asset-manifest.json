@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/monbudget/static/css/main.81b8570c.css",
+    "main.js": "/monbudget/static/js/main.0f1cbbbc.js",
+    "static/media/attention.png": "/monbudget/static/media/attention.1ada8d88fe962cc8e4d3.png",
+    "index.html": "/monbudget/index.html",
+    "main.81b8570c.css.map": "/monbudget/static/css/main.81b8570c.css.map",
+    "main.0f1cbbbc.js.map": "/monbudget/static/js/main.0f1cbbbc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.81b8570c.css",
+    "static/js/main.0f1cbbbc.js"
+  ]
+}
