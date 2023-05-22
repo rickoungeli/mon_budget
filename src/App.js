@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import Header from './components/commons/Header';
 import Home from './pages/Home';
@@ -11,6 +12,7 @@ import Categories from './pages/Categories';
 import NotFound from './pages/NotFound';
 
 const App = () => {
+
   
   return (
     <main className='main bg-light'>

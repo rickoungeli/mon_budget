@@ -1,17 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { selectDateTo, selectMonth } from "../../features/operationsReducer";
-import { DATES, SELECTED_OPS, LOAD_OPERATIONS } from '../../features/operationsReducer';
+import { selectDateFrom, selectDateTo, selectMonth, selectSelectedOps, selectSelectedMonth, selectSelectedYear } from "../../features/operationsReducer";
+import { DATES, SELECTED_OPS, SELECTED_MONTH, LOAD_OPERATIONS } from '../../features/operationsReducer';
 
 const DatesAndOperationsForm = () => {
     const dispatch = useDispatch();
-    const fmonth = useSelector(selectMonth); //Liste des mois
     const operations = JSON.parse(localStorage.getItem('operations')); //Liste des opérations
     const todaysdate = (new Date().toLocaleDateString()).split('/');  //Date du jour
-
-    const [selectedMonth, setSelectedMonth] = useState(todaysdate[1]);
-    const [selectedYear, setSelectedYear] = useState(todaysdate[2]);
-    const [selectedOperation, setSelectedOperation] = useState('D');
+    const fmonth = useSelector(selectMonth); //Liste des mois
+    const[dateFrom, setDateFrom] = useState(useSelector(selectDateFrom))
+    const[dateTo, setDateTo] = useState(useSelector(selectDateTo))
+    const [selectedMonth, setSelectedMonth] = useState(useSelector(selectSelectedMonth));
+    const [selectedYear, setSelectedYear] = useState(useSelector(selectSelectedYear));
+    //const [selectedOperation, setSelectedOperation] = useState('D');
 
     //Fonction pour trouver le nombre de jours du mois
     const getDaysNumber = (monthGived) => {
@@ -19,20 +20,13 @@ const DatesAndOperationsForm = () => {
         return day[0].lastday
     }
     
-    const[dateFrom, setDateFrom] = useState(todaysdate[2]+'-'+todaysdate[1]+'-'+'01'); //Premier jour du mois
-    const[dateTo, setDateTo] = useState(todaysdate[2]+'-'+todaysdate[1]+'-'+getDaysNumber(selectedMonth)) //Dernier jour du mois
-    useEffect(()=>{
-        dispatch(DATES({
-            dateFrom: todaysdate[2]+'-'+todaysdate[1]+'-'+'01',
-            dateTo: todaysdate[2]+'-'+todaysdate[1]+'-'+getDaysNumber(selectedMonth)
-        }))
 
-    }, [])
     //Comportements   
     const onMonthClicked = e => {
             setSelectedMonth(e.target.value)
             setDateFrom(selectedYear+'-'+e.target.value+'-'+'01');
             setDateTo(selectedYear+'-'+e.target.value+'-'+getDaysNumber(e.target.value));
+            dispatch(SELECTED_MONTH(e.target.value))
             dispatch(DATES({
                 dateFrom: selectedYear+'-'+e.target.value+'-'+'01',
                 dateTo: selectedYear+'-'+e.target.value+'-'+getDaysNumber(e.target.value)
@@ -41,18 +35,18 @@ const DatesAndOperationsForm = () => {
     }
    const onYearClicked = e => {
         setSelectedYear(e.target.value)
-        setSelectedMonth('01')
-        setDateFrom(e.target.value+'-'+'01'+'-'+'01');
-        setDateTo(e.target.value+'-'+'01'+'-'+'31');
+        //setSelectedMonth('01')
+        setDateFrom(e.target.value+'-'+selectedMonth+'-'+'01');
+        setDateTo(e.target.value+'-'+selectedMonth+'-'+getDaysNumber(selectedMonth));
         dispatch(DATES({
-            dateFrom: e.target.value+'-'+'01'+'-'+'01',
-            dateTo: e.target.value+'-'+'01'+'-'+'31'
+            dateFrom: e.target.value+'-'+selectedMonth+'-'+'01',
+            dateTo: e.target.value+'-'+selectedMonth+'-'+getDaysNumber(selectedMonth)
         }))
         dispatch(LOAD_OPERATIONS(true))
     }
 
     const onOperationClicked = e => {
-        setSelectedOperation(e.target.value)
+        //setSelectedOps(e.target.value)
         dispatch(SELECTED_OPS(e.target.value))
 
     }

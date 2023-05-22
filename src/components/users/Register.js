@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, {useState, useEffect} from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import Attention from '../../images/attention.png'
+import { confirmAlert } from 'react-confirm-alert';
 
 const Register = () => {
     const [alert, setAlert] = useState('')
@@ -10,6 +11,7 @@ const Register = () => {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
     const onSubmit = data => {
+        const navigate = useNavigate()
         setAlert('')
         const data1 = new FormData()
         data1.append('function', 'insertUserIntoBdd')
@@ -22,14 +24,14 @@ const Register = () => {
                 setAlert("Echec : l'inscription n'a pas réussi")
             } else {
                 if(res.data.includes('Vous avez été enregistré avec succès')){
-                    setAlert('Vous avez été enregistré avec succès')
+                    //setAlert('Vous avez été enregistré avec succès')
 
-                    setTimeout(() => {
-                        setAlert('')
-                        window.location = '/login'
-                    }, 2000);
-                }
-                //setAlert('Vous avez été enregistré avec succès')
+                    //setTimeout(() => {
+                    //    setAlert('')
+                    if (YesNo("Votre inscription a réussi, vous devez vous connecter")){
+                        navigate('/login')
+                    }
+                }           
                 
             }
         })

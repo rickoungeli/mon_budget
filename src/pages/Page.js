@@ -6,7 +6,7 @@ import axios from 'axios';
 import { dateParser } from '../utils/controllers';
 import { calculSomme } from '../utils/controllers';
 
-import { selectOperationsList, selectShowSaisieForm, selectLoadOperation, selectSelectedOperation, selectDateFrom, selectDateTo } from "../features/operationsReducer";
+import { selectOperationsList, selectShowSaisieForm, selectLoadOperation, selectSelectedOps, selectDateFrom, selectDateTo } from "../features/operationsReducer";
 import { SHOW_SAISIE_FORM, OPERATIONS_LIST } from '../features/operationsReducer';
 import { DELETED_ID, selectDeletedId, selectFonctionnality } from '../features/homeReducer';
 
@@ -22,7 +22,7 @@ const Page = (props) => {
     const [errorMessage, setErrorMessage] = useState('') 
     const showSaisieForm = useSelector(selectShowSaisieForm)
     const loadOperations = useSelector(selectLoadOperation)
-    const selectedOperation = useSelector(selectSelectedOperation)
+    const selectedOperation = useSelector(selectSelectedOps)
     const dateFrom = new Date(useSelector(selectDateFrom))
     const dateTo = new Date(useSelector(selectDateTo))
     const deletedId = useSelector(selectDeletedId)
@@ -41,6 +41,7 @@ const Page = (props) => {
                     setErrorMessage('Aucune opération trouvée')
                 } else {
                     dispatch(OPERATIONS_LIST(res.data))
+                    //setOperationsList(res.data)
                 }
             })
             .catch(err => {
@@ -48,6 +49,7 @@ const Page = (props) => {
             })
         //}
     }, [loadOperations /*, selectedOperation, dateFrom, dateTo */])
+
 
     const handleEdit = (operationId, operationType) => {
         operationsList.forEach((operation) => {
@@ -64,7 +66,7 @@ const Page = (props) => {
         <div className='page row no-gutters col-12'>
             <div className="page-titre d-flex justify-content-between px-2">
                 <h4 className='ps-2 my-2'>{props.fonctionnalite == 'previsions'? 'Liste des prévisions' : 'Liste des dépenses'}</h4>
-                <button className="btn btn-primary m-1" onClick={() => dispatch(SHOW_SAISIE_FORM({value:true, ops:'newOperation', id:''}))}>{props.fonctionnalite == 'previsions'? 'Ajouter une prévision' : 'Ajouter une dépense'}</button>
+                <button className="btn btn-primary m-1 fs-1 pt-0" onClick={() => dispatch(SHOW_SAISIE_FORM({value:true, ops:'newOperation', id:''}))}>+</button>
             </div>
             
             <DatesAndOperationsForm />

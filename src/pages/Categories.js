@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { useForm } from "react-hook-form"; //Cette librairie permet de gérer les formulaires avec react
+//import { useForm } from "react-hook-form"; //Cette librairie permet de gérer les formulaires avec react
 import { loadCategories, showCategoriesForm, selectLoadCategories, selectShowCategoriesForm } from '../features/categoriesReducer';
 import SaisieCategories from '../components/categories/SaisieCategories';
 
 const Categories = () => {
     const dispatch = useDispatch();
-    const { register, watch } = useForm();
     const user = localStorage.getItem('userId')
     const [categories, setCategories] = useState([])
     const [errorMessage, setErrorMessage] = useState('')
-    let loadCategoriesTrue = useSelector(selectLoadCategories)
+    //let loadCategoriesTrue = useSelector(selectLoadCategories)
     const operations = JSON.parse(localStorage.getItem('operations')) 
-    const selectedOperation = watch('selectedOperation', 'D')
     const saisieCategories = useSelector(selectShowCategoriesForm)
 
     //Récupération de la liste des categories
+    /*
     useEffect(() => { 
         if (loadCategoriesTrue) {
             setCategories(JSON.parse(localStorage.getItem('categories'))) 
             dispatch(loadCategories(false));
         }
     }, [loadCategoriesTrue])
-
+    */
     const handleEditCategorie = (id) => {
 
     }
@@ -34,6 +33,7 @@ const Categories = () => {
     
     return (
         <div>
+            
             <div className="d-flex justify-content-between ps-2">
                 <h4 className='text-center my-2'>LISTE DES CATEGORIES</h4>
             </div>
@@ -51,7 +51,7 @@ const Categories = () => {
                                 value={operation.id} 
                                 id={operation.id} 
                                 className='form-check-input ms-3' 
-                                {...register('selectedOperation')}  
+                                name = 'selectedOperation' 
                                 defaultChecked = {(operation.id == 'R') && 'checked'}
                             />
                             {operation.libelle}
@@ -68,7 +68,7 @@ const Categories = () => {
 
             {/* LISTE DES CATEGORIES */}
             <ul className='bg-success bg-opacity-25 col-12 col-md-10 col-lg-8 mx-auto'>                
-                {categories
+                {/*categories
                 .filter((categorie) => categorie.typeOps.includes(selectedOperation))
                 .map((categorie, index) => (
                     <li key={index}  className='row no-gutters border-bottom'>
@@ -77,7 +77,7 @@ const Categories = () => {
                         <button onClick={handleEditCategorie(categorie.id)} className='col-2 btn btn-primary '>Modifier</button>
                         <button onClick={handleDeleteCategorie(categorie.id)} className='col-2 btn btn-danger '>Supprimer</button>
                     </li>
-                ))  }   
+                )) */ }   
             </ul>
         </div>
     );

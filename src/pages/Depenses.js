@@ -4,7 +4,7 @@ import { BsTrash } from 'react-icons/bs';
 import { BsPencil } from 'react-icons/bs';
 import axios from 'axios';
 import { SHOW_SAISIE_FORM, LOAD_OPERATIONS_LIST } from '../features/operationsReducer';
-import { selectShowSaisieForm, selectLoadOperationList, selectSelectedOperation, selectDateFrom, selectDateTo } from "../features/operationsReducer";
+import { selectOperationsList, selectShowSaisieForm, selectLoadOperationList, selectSelectedOperation, selectDateFrom, selectDateTo } from "../features/operationsReducer";
 import DatesAndOperationsForm from '../components/commons/DatesAndOperationsForm';
 import SaisieForm from '../components/commons/SaisieForm';
 import { dateParser } from '../utils/controllers';
@@ -20,6 +20,7 @@ const Depenses = () => {
     const [depenses, setDepenses] = useState([])
     const [errorMessage, setErrorMessage] = useState('')
 
+    console.log(selectOperationsList);
     //Récupération de la liste des dépenses effectuées
     useEffect(() => { 
         if (loadOperationsList ) {
@@ -33,8 +34,10 @@ const Depenses = () => {
             .catch(err => {
                 setErrorMessage("Une erreur s'est produite" + err);
             })
+        } else {
+            setDepenses(selectOperationsList)
         }
-    }, [loadOperationsList, selectedOperation, dateFrom, dateTo])
+    }, [loadOperationsList, selectedOperation, dateFrom, dateTo, selectOperationsList])
 
 
     return (

@@ -8,6 +8,7 @@ import axios from 'axios';
 const Home = () => {
     const [page, setPage] = useState('')
     const [user, setUser] = useState(localStorage.getItem('userId'))
+    
 
     return (
         <div>

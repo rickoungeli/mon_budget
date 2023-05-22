@@ -10,19 +10,23 @@ import { AiFillExclamationCircle } from 'react-icons/ai';
 
 const CategorieForm = () => {
     const dispatch = useDispatch();
-    const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const user = localStorage.getItem('userId')
     const operations = JSON.parse(localStorage.getItem('operations'));
+    const [libelle, setLibelle] = useState('')
+    const [idTypeOps, setIdTypeOps] = useState('D');
     const [alert, setAlert] = useState('');
+    const [errorMessage, setErrorMessage] = useState('')
     
-    const onSubmit = data => {
-        const data1 = new FormData()
-        data1.append('function', 'insertCategorie')
-        data1.append('userId', data.userId) 
-        data1.append('libelle', data.libelle)
-        data1.append('typeOps', data.typeOps)
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        /*
+        const data = new FormData()
+        data.append('function', 'insertCategorie')
+        data.append('userId', data.userId) 
+        data.append('libelle', data.libelle)
+        data.append('typeOps', data.idTypeOps)
 
-        axios.post(`${process.env.REACT_APP_API_URL}categories.php`, data1)
+        axios.post(`${process.env.REACT_APP_API_URL}categories.php`, data)
         .then(res => {
             if(res.data=='') {
                setAlert("Echec : l'opération n'a pas réussi")
@@ -34,7 +38,12 @@ const CategorieForm = () => {
                 setAlert(res.data)
             }
         })
-        .catch(err => setAlert("L'opération a echoué "+ err))    
+        .catch(err => setAlert("L'opération a echoué "+ err)) 
+        */
+       console.log({
+        'libelle :' : libelle,
+        'idTypeOps :' : idTypeOps
+       })   
             
     }
 
@@ -54,7 +63,7 @@ const CategorieForm = () => {
                     </div>
                     <div className="modal-body">
                         {alert && <p className='alert alert-danger p-1'>{alert}</p> }
-                        <form onSubmit={handleSubmit(onSubmit)} className="row no-gutters m-3 px-2 py-1 mb-0 scroller">
+                        <form onSubmit={(e) => handleSubmit(e)} className="row no-gutters m-3 px-2 py-1 mb-0 scroller">
                             {/* Choix opération */}
                             <div className='groupe-type-operation d-flex text-white mb-3'>
                                 <p className='mb-0'>Types d'opérations :</p>
@@ -65,8 +74,9 @@ const CategorieForm = () => {
                                             value={operation.id} 
                                             id={operation.id} 
                                             className='form-check-input ms-3' 
-                                            {...register('selectedOperation')}  
-                                            defaultChecked = {(operation.id == 'R') && 'checked'}
+                                            name = 'idTypeOps'
+                                            onChange={e => setIdTypeOps(e.target.value)} 
+                                            defaultChecked = {operation.id == idTypeOps? 'checked':null}
                                         />
                                         {operation.libelle}
                                     </label> 
@@ -79,20 +89,16 @@ const CategorieForm = () => {
                                 <input 
                                     type="text" 
                                     id='libelle'
-                                    {...register('libelle', {
-                                        required:'Le libellé est requis', 
-                                        minLength: {value:2, message: 'Vous devez entre au moins deux caractères'},
-                                        maxLength: {value: 255, message: ''}
-                                    })}
-                                    className={errors.libelle? "form-control border border-2 border-danger" : "form-control"}/>
+                                    name = 'libelle' 
+                                    className={errorMessage? "form-control border border-2 border-danger" : "form-control"}/>
                             </div>
-                            {errors.libelle && <p className='text-danger'>{errors.libelle.message}</p>}
+                            {errorMessage && <p className='text-danger'>{errorMessage}</p>}
                             
                             <input 
                                 type="hidden" 
                                 id='userId'
                                 value={user.id}
-                                {...register('userId')} 
+                                name = 'userId' 
                             />
                             <div className="col-12 text-center mb-3 " id="form-group3">
                                 <button className="btn btn-primary" >Enregistrer</button>

@@ -5,7 +5,7 @@ import axios from 'axios';
 //Import from features
 import { SHOW_SAISIE_FORM, LOAD_OPERATIONS, OPERATIONS_LIST } from '../../features/operationsReducer';
 import { selectShowSaisieForm, selectOperationsList } from '../../features/operationsReducer';
-import { DELETED_ID, selectFonctionnality } from '../../features/homeReducer';
+import { selectFonctionnality } from '../../features/homeReducer';
 
 //Import from react-icons
 import { AiFillExclamationCircle } from 'react-icons/ai';
@@ -171,7 +171,7 @@ const PrevisionForm = (props) => {
                         //c'est une création on recharge les opérations
                         dispatch(LOAD_OPERATIONS(true))
                     } else {
-                        //c'est une modification, on modifi dans le store
+                        //c'est une modification, on modifie dans le store
                         let newOperationsList = []
                         newOperationsList.push({
                             id:showSaisieForm.operation.id,
@@ -181,12 +181,14 @@ const PrevisionForm = (props) => {
                             idTypeOps:idTypeOps,
                             montant:montant
                         })
+                        
                         operationsList.map((operation) => {
                             if(operation.id !== showSaisieForm.operation.id){
                                 newOperationsList.push(operation)
                             }  
                         })
-                        dispatch(OPERATIONS_LIST(newOperationsList));
+                        
+                        dispatch(LOAD_OPERATIONS(true));
                     }
                     setTimeout(()=> {
                         setAlert('')
