@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import React from 'react';
 import { Routes, Route } from "react-router-dom";
 import Header from './components/commons/Header';
 import Home from './pages/Home';
@@ -12,10 +11,8 @@ import Categories from './pages/Categories';
 import NotFound from './pages/NotFound';
 
 const App = () => {
-
-  
   return (
-    <main className='main bg-light'>
+    <main className='main'>
       <Header />
       <Routes basename={process.env.PUBLIC_URL} >
         <Route path="/" element={<Home />} />

@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 
 //Import from features
-import { SHOW_SAISIE_FORM, LOAD_OPERATIONS, OPERATIONS_LIST } from '../../features/operationsReducer';
-import { selectShowSaisieForm, selectOperationsList } from '../../features/operationsReducer';
-import { selectFonctionnality } from '../../features/homeReducer';
+import { LOAD_OPERATIONS, OPERATIONS_LIST } from '../../features/operationsReducer';
+import { selectOperationsList } from '../../features/operationsReducer';
 
 //Import from react-icons
 import { AiFillExclamationCircle } from 'react-icons/ai';
 
 import { useCheckLibelle } from '../../utils/controllers';
 
+import { InputText } from '../formComponents/InputText';
 
-const PrevisionForm = (props) => {
-    const dispatch = useDispatch();
+
+const SaisieForm = ({showSaisieForm, toggleSaisieForm, fonctionnalite}) => {
+    const dispatch = useDispatch()
     const user = localStorage.getItem('userId')
-    const operations = JSON.parse(localStorage.getItem('operations'));
+    const operations = JSON.parse(localStorage.getItem('typeOperations'));
     const categories = JSON.parse(localStorage.getItem('categories'));
 
-    const showSaisieForm = useSelector(selectShowSaisieForm);
-    const fonctionnalite = useSelector(selectFonctionnality);
     const operationsList = useSelector(selectOperationsList)
-
+    
     const todaysdate = (new Date().toLocaleDateString()).split('/');
     const todays = todaysdate[2]+'-'+todaysdate[1]+'-'+todaysdate[0];
     const [libelle, setLibelle] = useState('')
     const [dateOps, setDateOps] = useState(todays)
     const [idTypeOps, setIdTypeOps] = useState('D');
     const [idCategorie, setIdCategorie] = useState(categories[0].id);
+    const [libCat, setLibCat] = useState('')
     const [montant, setMontant] = useState('')
     const [checkbox, setCheckbox] = useState(false)
     const [alert, setAlert] = useState('')
@@ -36,10 +36,10 @@ const PrevisionForm = (props) => {
     const [errorMessage, setErrorMessage] = useState('')
     const [dateOpsMessage, setDateOpsMessage] = useState('')
     const [montantMessage, setMontantMessage] = useState('')
-
+    
     const data = new FormData()
     data.append('iduser', user)
-    data.append('fonctionnalite', props.fonctionnalite)
+    data.append('fonctionnalite', fonctionnalite)
 
     const arrayCompare = (arrayA, arrayB) => {
         for (let i = 0; i < arrayA.length; i++) {
@@ -86,39 +86,20 @@ const PrevisionForm = (props) => {
     };
     
     useEffect(() => { 
-        if (showSaisieForm.ops=='editOperation' || showSaisieForm.ops=='deletePrevision') {
-            setIdCategorie(showSaisieForm.operation.idcategorie)
-            setIdTypeOps(showSaisieForm.operation.idtypeops)
-            setLibelle(showSaisieForm.operation.libelle)
-            setDateOps(showSaisieForm.operation.dateops)
-            setMontant(showSaisieForm.operation.montant)
+        if (showSaisieForm.operationType=='editOperation' || showSaisieForm.operationType=='deletePrevision') {
+            setIdCategorie(showSaisieForm.operationItem.idcategorie)
+            setIdTypeOps(showSaisieForm.operationItem.idtypeops)
+            setLibelle(showSaisieForm.operationItem.libelle)
+            setDateOps(showSaisieForm.operationItem.dateops)
+            setMontant(showSaisieForm.operationItem.montant)
         }
     }, [])
 
-    const handleDelete = () => {
-        data.append('function', 'deletePrevision')
-        data.append('idoperation', showSaisieForm.operation.id)
-        axios.post(`${process.env.REACT_APP_API_URL}depenses.php`, data)
-        .then(res => {
-           if(res.data=='Prévision supprimée'){
-                //
-                let newOperationsList = []
-                operationsList.map((operation) => {
-                    if(operation.id !== showSaisieForm.operation.id){
-                        newOperationsList.push(operation)
-                    }  
-                })
-                dispatch(OPERATIONS_LIST(newOperationsList));
-                dispatch(SHOW_SAISIE_FORM({showSaisieForm:false, ops:'', operation:{}}))                
-           }
-        })
-        .catch(err => setAlert("L'opération a echoué "+ err))
-    }
-
+    
     //Fonction pour transformer une prévision en une opération effectuée
     const handleTransformPrevision = () => {
         data.append('function', 'transformPrevision')
-        data.append('idoperation', showSaisieForm.operation.id)
+        data.append('idoperation', showSaisieForm.operationItem.id)
         data.append('libelle', libelle)
         data.append('dateops', dateOps)
         data.append('idtypeops', idTypeOps)
@@ -130,20 +111,35 @@ const PrevisionForm = (props) => {
                 setAlert(res.data)
                 //dispatch(LOAD_OPERATIONS(true))
                 //On supprime la prévision dans le store
-
-
-
+                
+                
+                
                 setTimeout(()=> {
                     setAlert('')
                     setLibelle('')
                     setMontant('')
-                    dispatch(SHOW_SAISIE_FORM({value:false, ops:'', operation:{}}))
+                    toggleSaisieForm(false, '', {})
                 }, 2000)             
             }
         })
         .catch(err => setAlert("L'opération a echoué "+ err))
     }
-        
+    //Fonction pour supprimer une opération de la bdd
+    const handleDelete = () => {
+        const operationId = showSaisieForm.operationItem.id
+        data.append('function', 'deletePrevision')
+        data.append('idoperation', operationId)
+        axios.post(`${process.env.REACT_APP_API_URL}operations.php`, data)
+        .then(res => {
+           if(res.data=='Prévision supprimée'){
+               //On ferme le formulaire et on supprime l'item dans le store du parent
+               toggleSaisieForm(false, 'deleteItemFromStore', showSaisieForm.operationItem)   
+           }
+        })
+        .catch(err => setAlert("L'opération a echoué "+ err))
+    }
+    
+    //Fonction pour créer ou modifier une opération dans la bdd
     const handleSubmit = (e) => {
         e.preventDefault()
         const checkLibelle1 = checkLibelle(libelle)
@@ -152,50 +148,61 @@ const PrevisionForm = (props) => {
         const checkResultArray=[checkLibelle1, checkDateOps1, checkMontant1]
         
         if ( arrayCompare(checkResultArray, [false, false, false]) !== false) {
-            showSaisieForm.operation? data.append('idoperation', showSaisieForm.operation.id):null
+            showSaisieForm.operationType=='editOperation'? data.append('idoperation', showSaisieForm.operationItem.id):null
             data.append('libelle', libelle)
             data.append('montant', montant)
             data.append('dateops', dateOps)
             data.append('idtypeops', idTypeOps)
             data.append('idcategorie', idCategorie)
-            showSaisieForm.ops == 'newOperation' && data.append('function', 'insertOperation')
-            showSaisieForm.ops == 'editOperation' && data.append('function', 'editOperation')
+            showSaisieForm.operationType == 'newOperation' && data.append('function', 'insertOperation')
+            showSaisieForm.operationType == 'editOperation' && data.append('function', 'editOperation')
             
-            axios.post(`${process.env.REACT_APP_API_URL}depenses.php`, data)
+            axios.post(`${process.env.REACT_APP_API_URL}operations.php`, data)
             .then(res => {
+                //console.log(res);
                 if(res.data=='') {
+                    
                     setAlert("Echec : l'opération n'a pas réussi")
                 } else if(res.data=='Opération enregistrée !' || res.data=='Modification enregistrée'){
                     setAlert(res.data)
-                    if(showSaisieForm.ops=='newOperation') {
+                    if(showSaisieForm.operationType=='newOperation') {
                         //c'est une création on recharge les opérations
                         dispatch(LOAD_OPERATIONS(true))
+                        
                     } else {
-                        //c'est une modification, on modifie dans le store
-                        let newOperationsList = []
-                        newOperationsList.push({
-                            id:showSaisieForm.operation.id,
-                            libelle:libelle,
-                            dateOps:dateOps,
-                            idCategorie:idCategorie,
-                            idTypeOps:idTypeOps,
-                            montant:montant
+                        //c'est une modification, 
+                        //Je récupère le libelle catégorie
+                        axios.get(`${process.env.REACT_APP_API_URL}categories.php?function=getLibelleCategorie&iduser=${user}&idcategorie=${idCategorie}`)
+                        .then (res => {
+                            if(!res.data) {
+                                setErrorMessage("une erreur s'est produite...")
+                            } else {
+                                //dispatch(OPERATIONS_LIST(res.data))
+                                //console.log(res.data);
+                                //libelleCategorie = res.data
+                                //On ferme le formulaire et on modifie l'item dans le store du parent
+                                toggleSaisieForm(false, 'editItemFromStore', {
+                                    id:showSaisieForm.operationItem.id,
+                                    categorie:res.data.libelle,
+                                    libelle:libelle,
+                                    dateops:dateOps,
+                                    idcategorie:idCategorie,
+                                    idtypeops:idTypeOps,
+                                    montant:montant
+                                }) 
+                            }
                         })
-                        
-                        operationsList.map((operation) => {
-                            if(operation.id !== showSaisieForm.operation.id){
-                                newOperationsList.push(operation)
-                            }  
+                        .catch(err => {
+                            setErrorMessage("Une erreur s'est produite" + err);
                         })
-                        
-                        dispatch(LOAD_OPERATIONS(true));
+                          
                     }
                     setTimeout(()=> {
                         setAlert('')
                         !checkbox && setLibelle('')
                         !checkbox && setMontant('')
                         checkbox && setDateOps('')
-                        showSaisieForm.ops=='editOperation'? dispatch(SHOW_SAISIE_FORM({value:false, ops:'', operation:{}})):null
+                        showSaisieForm.operationType=='editOperation'? toggleSaisieForm(false, '', {}):null
                     }, 2000)
                 }
             })
@@ -212,17 +219,17 @@ const PrevisionForm = (props) => {
                     <div className="modal-header bg-light p-1">
                         <div>
                             <h5 className="modal-title text-center text-dark">
-                                {showSaisieForm.ops == 'newOperation' && props.fonctionnalite=='previsions'? "Saisie d'une prévision" : null} 
-                                {showSaisieForm.ops == 'newOperation' && props.fonctionnalite=='depenses'? "Saisie d'une opération effectuée" : null} 
-                                {showSaisieForm.ops == 'editOperation' && props.fonctionnalite=='previsions'? "Modification d'une prévision" : null}
-                                {showSaisieForm.ops == 'editOperation' && props.fonctionnalite=='depenses'? "Modification d'une opération effectuée" : null}
-                                {showSaisieForm.ops == 'deletePrevision' ? "Voulez-vous enregistrer cette prévision comme une opération effectuée?" : null}
+                                {showSaisieForm.operationType == 'newOperation' && fonctionnalite=='previsions'? "Saisie d'une prévision" : null} 
+                                {showSaisieForm.operationType == 'newOperation' && fonctionnalite=='depenses'? "Saisie d'une opération effectuée" : null} 
+                                {showSaisieForm.operationType == 'editOperation' && fonctionnalite=='previsions'? "Modification d'une prévision" : null}
+                                {showSaisieForm.operationType == 'editOperation' && fonctionnalite=='depenses'? "Modification d'une opération effectuée" : null}
+                                {showSaisieForm.operationType == 'deletePrevision' ? "Voulez-vous enregistrer cette prévision comme une opération effectuée?" : null}
                                 
                             </h5>
-                            {showSaisieForm.ops == 'deletePrevision' ? <small className='d-block text-center mb-1 fs-6'>(si vous cliquez sur non, la prévision sera supprimée)</small> : null}
+                            {showSaisieForm.operationType == 'deletePrevision' ? <small className='d-block text-center mb-1 fs-6'>(si vous cliquez sur non, la prévision sera supprimée)</small> : null}
 
                         </div>
-                        <button type="button" className="close bg-danger border border-secondary px-3 text-light rounded" onClick={()=> dispatch(SHOW_SAISIE_FORM({value:false, ops:'', operation:{}}))}>
+                        <button type="button" className="close bg-danger border border-secondary px-3 text-light rounded" onClick={()=> toggleSaisieForm(false, '', '')}>
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -255,7 +262,11 @@ const PrevisionForm = (props) => {
                                     id="categorie" 
                                     name = 'idCategorie'  
                                     value={idCategorie}
-                                    onChange={e => setIdCategorie(e.target.value)}
+                                    onChange={(e) => {
+                                        setIdCategorie(e.target.value)
+                                        setLibCat(e.target.libelle)
+                                    
+                                    }}
                                     className="rounded" 
                                     >
                                     {categories
@@ -267,58 +278,66 @@ const PrevisionForm = (props) => {
                             </div>
 
                             {/* Libellé opération */}
-                            <div className="form-group d-flex flex-column mb-0">
+                            {/* <div className="form-group d-flex flex-column mb-0">
                                 <label htmlFor="libelle" className='text-white me-2'>Libellé :</label>
                                 <input 
                                     type="text" 
                                     id='libelle'
-                                    name = 'libelle' 
-                                    value = {libelle}
-                                    onChange={e => setLibelle(e.target.value)} 
-                                    className={
-                                        libelleMessage? "form-control border border-2 border-danger" : 
-                                        ((showSaisieForm.ops=='deletePrevision' || showSaisieForm.ops=='deleteOperation')? "form-control disabled" : "form-control")
-                                    }
+                                    
                                 />
-                            </div>
+                            </div> */}
+
+                            <InputText 
+                                type='text'
+                                id='libelle' 
+                                label='Libelle :'
+                                name = 'libelle' 
+                                value = {libelle}
+                                onChange={setLibelle} 
+                                className={
+                                    libelleMessage? "form-control border border-2 border-danger" : 
+                                    ((showSaisieForm.operationType=='deletePrevision' || showSaisieForm.operationType=='deleteOperation')? "form-control disabled" : "form-control")
+                                }
+
+                            />
+
                             {libelleMessage && <p className='text-danger'>{libelleMessage}</p>}
                             
                             {/* Date de l'opération */}
-                            <div className="groupe-date-debut d-flex flex-column mb-0">
-                                <label htmlFor="date-ops" className='text-white'>Date de l'opération :</label>
-                                <input 
+                                <InputText 
                                     type="date" 
                                     id='date-ops' 
+                                    label="Date de l'opération :"
                                     name = 'dateOps'
                                     value={dateOps}
-                                    onChange={e => setDateOps(e.target.value)} 
+                                    onChange={setDateOps} 
                                     className={
                                         dateOpsMessage? "form-control border border-2 border-danger" : 
-                                        ((showSaisieForm.ops=='deletePrevision' || showSaisieForm.ops=='deleteOperation')? "form-control disabled" : "form-control")
+                                        ((showSaisieForm.operationType=='deletePrevision' || showSaisieForm.operationType=='deleteOperation')? "form-control disabled" : "form-control")
                                     }
                                 />
-                            </div>
                             {dateOpsMessage && <span className='text-danger'>{dateOpsMessage}</span>}
 
                             {/* Coût de l'opération */}
-                            <div className="form-group d-flex flex-column mb-0" >
-                                <label htmlFor="montant" className='text-white'>Montant :</label>
-                                <input 
-                                    type="text" 
+                            
+                                
+                                <InputText 
+                                    type='text'
+                                    label="Montant :" 
                                     id='montant'
                                     name = 'montant' 
                                     value = {montant}
-                                    onChange={e => setMontant(e.target.value)} 
+                                    onChange={setMontant} 
                                     className={
                                         montantMessage? "form-control border border-2 border-danger" : 
-                                        ((showSaisieForm.ops=='deletePrevision' || showSaisieForm.ops=='deleteOperation')? "form-control disabled" : "form-control")
+                                        ((showSaisieForm.operationType=='deletePrevision' || showSaisieForm.operationType=='deleteOperation')? "form-control disabled" : "form-control")
                                     }
                                 />
-                            </div>
+                            
                             {montantMessage && <span className='text-danger'>{montantMessage}</span>}
                             
                             {
-                                showSaisieForm.ops=='newOperation' && 
+                                showSaisieForm.operationType=='newOperation' && 
                                 <div className="form-group d-flex mb-0" >
                                     <input 
                                         type="checkbox" 
@@ -335,9 +354,9 @@ const PrevisionForm = (props) => {
 
 
                             <div className="d-flex justify-content-center gap-2 my-2 ">
-                                {showSaisieForm.ops=='deletePrevision' && <button onClick={()=>{handleTransformPrevision()}} className='btn btn-primary'>Oui</button>}
-                                <button onClick={(e)=>{showSaisieForm.ops=='deletePrevision' ? handleDelete() : handleSubmit(e)}} className={showSaisieForm.ops=='deletePrevision' ? 'btn btn-danger' : "btn btn-primary"} >
-                                    {showSaisieForm.ops=='deletePrevision' ? 'non' : 'Enregistrer'}
+                                {showSaisieForm.operationType=='deletePrevision' && <button onClick={()=>{handleTransformPrevision()}} className='btn btn-primary'>Oui</button>}
+                                <button onClick={(e)=>{showSaisieForm.operationType=='deletePrevision' ? handleDelete() : handleSubmit(e)}} className={showSaisieForm.operationType=='deletePrevision' ? 'btn btn-danger' : "btn btn-primary"} >
+                                    {showSaisieForm.operationType=='deletePrevision' ? 'non' : 'Enregistrer'}
                                 </button>
                             </div>
                         </form>
@@ -353,4 +372,4 @@ const PrevisionForm = (props) => {
     );
 };
 
-export default PrevisionForm;
+export default SaisieForm;

@@ -5,7 +5,8 @@ import { DATES, SELECTED_OPS, SELECTED_MONTH, LOAD_OPERATIONS } from '../../feat
 
 const DatesAndOperationsForm = () => {
     const dispatch = useDispatch();
-    const operations = JSON.parse(localStorage.getItem('operations')); //Liste des opérations
+    const operationsType = JSON.parse(localStorage.getItem('typeOperations')); //Liste des opérations
+    
     const todaysdate = (new Date().toLocaleDateString()).split('/');  //Date du jour
     const fmonth = useSelector(selectMonth); //Liste des mois
     const[dateFrom, setDateFrom] = useState(useSelector(selectDateFrom))
@@ -45,7 +46,7 @@ const DatesAndOperationsForm = () => {
         dispatch(LOAD_OPERATIONS(true))
     }
 
-    const onOperationClicked = e => {
+    const onTypeOperationClicked = e => {
         //setSelectedOps(e.target.value)
         dispatch(SELECTED_OPS(e.target.value))
 
@@ -68,23 +69,23 @@ const DatesAndOperationsForm = () => {
     }
    
     return (
-        <form className='dates-form col-12 col-md-10 col-lg-8 rounded-2 bg-success text-light p-1'>
+        <form className='page-dates-form col-12 col-md-10 col-lg-8 bg-success text-light p-1 '>
             <div className='d-flex'>
                 {/* Groupe choix opération */}
                 <div className='groupe-type-operation d-flex flex-column col-4 p-2'>
                     <p className='mb-0'>Types d'opérations :</p>
-                    {operations.map((operation) => (
-                        <label htmlFor={operation.id} key={operation.id} className='form-check-label'>
+                    {operationsType.map((typeOps) => (
+                        <label htmlFor={typeOps.id} key={typeOps.id} className='form-check-label'>
                             <input 
                                 type="radio" 
-                                id={operation.id} 
-                                name='selectedOperation'
-                                value={operation.id} 
+                                id={typeOps.id} 
+                                name='selectedtypeOperation'
+                                value={typeOps.id} 
                                 className='form-check-input' 
-                                defaultChecked = {(operation.id == 'D') && 'checked'}
-                                onChange={(e)=> onOperationClicked(e)}
+                                defaultChecked = {(typeOps.id == 'D') && 'checked'}
+                                onChange={(e)=> onTypeOperationClicked(e)}
                             />
-                            {operation.libelle}
+                            {typeOps.libelle}
                         </label> 
                     ))}  
                 </div>

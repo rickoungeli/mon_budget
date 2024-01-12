@@ -29,6 +29,28 @@ $font5: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 body {
     font-size: $font-size;
     font-family: $font2;
+    height: 100vh;
+    //border: 1px solid yellow;
+}
+
+#root {
+    height: 100vh;
+    //border: 4px solid green;
+    //position: absolute;
+}
+
+.main {
+    //height:100vh;
+    //overflow-x: scroll;
+    //background-color: #db2b39;
+    background-color: rgb(249, 247, 247);
+    //border: 5px solid red;
+    // position: fixed;
+    // top: 0;
+    // bottom: 0;
+    // left: 0;
+    // right: 0;
+
 }
 
 
@@ -53,38 +75,46 @@ h2 {
     font-size: $font-size*2;
 }
 
-ul {
-    list-style: none;
-    margin-bottom: 0;
-    padding: 10px;
-    height: 40vh;
-}
-.main {
+//ul {
+    //list-style: none;
+    //margin-bottom: 0;
+    //padding: 10px;
+    //height: 40vh;
+//}
 
-    width: 100%;
-    margin: 0 auto;
-    overflow-x: hidden;
-    background-color: #db2b39;
-    border: 2px solid #db2b39;
-    height: 100vh
-}
+
 .page {
-    &-titre {
-        height: 40px;
-    }
 
-    .dates-form {
+    //border: 3px solid blue;
+    //height: calc(100% - 52px) !important;
+    //overflow: hidden;
+    //position: relative;
+
+    
+    &-dates-form {
         height: 100px;
         margin: 0 auto;
         padding-left: 10px;
+        position: sticky;
+        top:50px;
+        left: 0;
     }
 
-    .ul-scrolling {
-        
-        overflow-y: scroll;
-        overflow-x: hidden;
-        width: 98vw;
-        height: 65vh;
+    &-titre {
+        height: 40px;
+        background-color: yellow;
+        padding: 2px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+
+    &-ul {
+        //border: 3px solid blue;
+        //overflow-y: scroll;
+        //overflow-x: hidden;
+        width: 100%;
+        //height: calc(100vh - 260px);
         
         display: flex;
         flex-direction: column;
@@ -97,7 +127,11 @@ ul {
         color: $textColor;
         font-weight: bold;
         height: 30px;
-
+        //position: absolute;
+        //bottom: 0;
+        //left: 0;
+        width: 100%;
+        background-color: $color-1;
     }
 
     li {
@@ -178,7 +212,7 @@ input::placeholder {
 }
 
 .table {
-    min-width: 300px;
+    //min-width: 300px;
     overflow-x: scroll;
     width: 100%;
 }

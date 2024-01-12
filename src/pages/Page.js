@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 import { BsTrash } from 'react-icons/bs';
 import { BsPencil } from 'react-icons/bs';
-import axios from 'axios';
 import { dateParser } from '../utils/controllers';
 import { calculSomme } from '../utils/controllers';
 
-import { selectOperationsList, selectShowSaisieForm, selectLoadOperation, selectSelectedOps, selectDateFrom, selectDateTo } from "../features/operationsReducer";
+import { selectSelectedOps, selectDateFrom, selectDateTo } from "../features/operationsReducer";
 import { SHOW_SAISIE_FORM, OPERATIONS_LIST } from '../features/operationsReducer';
 import { DELETED_ID, selectDeletedId, selectFonctionnality } from '../features/homeReducer';
 
+//Importation des components
 import DatesAndOperationsForm from '../components/commons/DatesAndOperationsForm';    
 import SaisieForm from '../components/commons/SaisieForm';
 
-
-const Page = (props) => {
+const Page = ({fonctionnalite}) => {
     const dispatch = useDispatch();
     let totalMontant = 0
     const user = localStorage.getItem('userId')
-    const operationsList = useSelector(selectOperationsList)
+    const [showSaisieForm, setShowSaisieForm] = useState('')
+    const [operationsList, setOperationsList] = useState([])
     const [errorMessage, setErrorMessage] = useState('') 
-    const showSaisieForm = useSelector(selectShowSaisieForm)
-    const loadOperations = useSelector(selectLoadOperation)
+    
+    const [loadOperations, setLoadOperations] = useState(false)
+    // const [selectedOperation, setSelectedOperation] = useState('D')
     const selectedOperation = useSelector(selectSelectedOps)
     const dateFrom = new Date(useSelector(selectDateFrom))
     const dateTo = new Date(useSelector(selectDateTo))
-    const deletedId = useSelector(selectDeletedId)
-    
     const calculSomme = (montant) => {
         totalMontant += parseFloat(montant)
     
@@ -35,13 +35,13 @@ const Page = (props) => {
     //Récupération de la liste des opérations
     useEffect(() => { 
         //if (loadOperationsList) {
-            axios.get(`${process.env.REACT_APP_API_URL}depenses.php?function=getOperations&iduser=${user}`)
+            axios.get(`${process.env.REACT_APP_API_URL}operations.php?function=getOperations&iduser=${user}`)
             .then (res => {
+                //console.log(res);
                 if(!res.data) {
                     setErrorMessage('Aucune opération trouvée')
                 } else {
-                    dispatch(OPERATIONS_LIST(res.data))
-                    //setOperationsList(res.data)
+                    setOperationsList(res.data)
                 }
             })
             .catch(err => {
@@ -51,35 +51,87 @@ const Page = (props) => {
     }, [loadOperations /*, selectedOperation, dateFrom, dateTo */])
 
 
-    const handleEdit = (operationId, operationType) => {
-        operationsList.forEach((operation) => {
-            if(operation.id == operationId){
-                dispatch(SHOW_SAISIE_FORM({value:true, ops:operationType, operation:operation}))
+    //Fonction pour afficher/fermer le formulaire de saisie/édition d'une opération
+    const toggleSaisieForm = (value, operationType, operationItem) => {
+        if (value==true) { 
+            setShowSaisieForm({
+                value:value, 
+                operationType:operationType, 
+                operationItem:operationItem
+            })
+        }
 
-            }
+        if (value==false && operationType=="deleteItemFromStore") { 
+            //On supprime l'élément dans le store du parent
+            handleRemoveItemFromStore(operationItem.id)
+        } 
 
-        })
+        if (value==false && operationType=="editItemFromStore") { 
+            //On modifie l'élément dans le store du parent
+            //console.log(operationItem);
+            let newOperationsList = []  
+            
+            operationsList.forEach((operation) => {
+                if(operation.id !== operationItem.id){
+                    newOperationsList.push(operation)
+                } else {
+                    let operationItem1 = {...operationItem, isconfirmed:operation.isconfirmed}                
+                    newOperationsList.push(operationItem1)
+                } 
+            })
+
+            setOperationsList(newOperationsList)
+            setShowSaisieForm({
+                value:value, 
+                operationType:'', 
+                operationItem:''
+            })
+            
+        } 
+        if (value==false && operationType=='' && operationItem=='') {
+            setShowSaisieForm({
+                ...showSaisieForm,
+                value:false 
+            })
+            
+        } 
+        
+    //Fonction pour modifier une opération dans le store
+    const handleEditItemFromStore = (operationItem) => {
+
+        console.log(operationItem);
+        /*
+        
+        */
     }
+        
+    }
+    //Fonction pour retirer du store une opération supprimée 
+    const handleRemoveItemFromStore = (id) => {
+        setOperationsList(operationsList.filter((operation) => operation.id !== id))
+    }
+    
+                
+                
        
     return (
 
-        <div className='page row no-gutters col-12'>
-            <div className="page-titre d-flex justify-content-between px-2">
-                <h4 className='ps-2 my-2'>{props.fonctionnalite == 'previsions'? 'Liste des prévisions' : 'Liste des dépenses'}</h4>
-                <button className="btn btn-primary m-1 fs-1 pt-0" onClick={() => dispatch(SHOW_SAISIE_FORM({value:true, ops:'newOperation', id:''}))}>+</button>
+        <div className='page'>
+            <DatesAndOperationsForm />
+            <div className="page-titre">
+                <h4 className='ps-2 my-2'>{fonctionnalite == 'previsions'? 'Liste des prévisions' : 'Liste des dépenses'}</h4>
+                <button className="btn btn-primary m-1 fs-1 pt-0" onClick={() => toggleSaisieForm(true,'newOperation',{})}>+</button>
             </div>
             
-            <DatesAndOperationsForm />
             
-            <ul className='ul-scrolling col-11 col-md-10 col-lg-8 my-0' >                
+            <ul className='page-ul m-0' >                
                 {errorMessage? <div className='alert alert-danger text-center mx-3 my-2 p-1'>{errorMessage}</div> : 
                 
                 operationsList
-                .filter((operation) => props.fonctionnalite=='previsions'? operation.isconfirmed==0 : operation.isconfirmed==1)
+                .filter((operation) => fonctionnalite=='previsions'? operation.isconfirmed==0 : operation.isconfirmed==1)
                 .filter((operation) => operation.idtypeops.includes(selectedOperation))
                 .filter((operation) => new Date(operation.dateops).getTime() >= dateFrom.getTime() && 
                                         new Date(operation.dateops).getTime() <= dateTo.getTime())
-                
                 .map((operation, index) => 
                     
                     (
@@ -93,23 +145,29 @@ const Page = (props) => {
                             </div>
                             <div className='d-flex align-items-start'>
                                 <span className='text-right text-danger'>{operation.montant} €</span>
-                                <button onClick={()=>handleEdit(operation.id, 'editOperation')} className="btn col-1 py-0"><BsPencil /></button>
-                                <button onClick={()=>props.fonctionnalite=='previsions' && handleEdit(operation.id, 'deletePrevision')} className="btn "><BsTrash /></button>
+                                <button onClick={()=>toggleSaisieForm(true, 'editOperation', operation)} className="btn col-1 py-0"><BsPencil /></button>
+                                <button onClick={()=>fonctionnalite=='previsions' && toggleSaisieForm(true, 'deletePrevision', operation)} className="btn "><BsTrash /></button>
                             </div>
                             <div className="d-none">{calculSomme(operation.montant)}</div>
                         </li>
                     )
                     
-                )}   
+                )} 
+                <div className='total-line'>
+                    <span className='col-3'></span>
+                    <span className='col-4'>Total</span>
+                    <span className='col-3'>{parseFloat(totalMontant).toFixed(2)} €</span>
+                    <span className='col-2'></span>
+                </div>
             </ul>
-            <div className='total-line bg-primary '>
-                <span className='col-3'></span>
-                <span className='col-4'>Total</span>
-                <span className='col-3'>{parseFloat(totalMontant).toFixed(2)} €</span>
-                <span className='col-2'></span>
-            </div>
             
-            {showSaisieForm.value && <SaisieForm fonctionnalite={props.fonctionnalite} />}
+            
+            {showSaisieForm.value && 
+                <SaisieForm 
+                    fonctionnalite={fonctionnalite} 
+                    toggleSaisieForm={toggleSaisieForm} 
+                    showSaisieForm={showSaisieForm}
+                />}
                 
         </div>
     );

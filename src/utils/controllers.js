@@ -38,3 +38,8 @@ export const useCheckLibelle = (libelle) => {
     }
 };
 
+//Fonction pour récupérer la valeur de l'élément sélectionné dans un combobox
+export const valueReturner = (id, liste) => {
+    let newTable = ''
+    return newTable
+}
